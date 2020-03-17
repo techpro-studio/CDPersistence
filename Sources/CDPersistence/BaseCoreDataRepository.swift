@@ -51,7 +51,7 @@ open class BaseCoreDataRepository<T:CDRepresentable>: AbstractRepository where T
         return self.get(predicate: self.getIdPredicate(id: id))
     }
 
-    private func getIdPredicate(id: T.Identifier) -> NSPredicate {
+    open func getIdPredicate(id: T.Identifier) -> NSPredicate {
         return NSPredicate(format: "\(T.CoreDataType.primaryKey)=\(id)")
     }
 
