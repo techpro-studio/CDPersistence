@@ -63,8 +63,7 @@ open class BaseCoreDataRepository<T:CDRepresentable>: AbstractRepository where T
     }
 
     public func find(request: FindRequest) -> [T] {
-        let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: request.predicates)
-        return self.getManagedObjects(predicate: compoundPredicate, sortDescriptors: request.sortDescriptors, skip:  request.skip, limit: request.limit).map { $0.asDomain() }
+        return self.getManagedObjects(predicate: request.predicate, sortDescriptors: request.sortDescriptors, skip:  request.skip, limit: request.limit).map { $0.asDomain() }
     }
 
     private func getManagedObjects(predicate: NSPredicate, sortDescriptors: [NSSortDescriptor]?=nil, skip: Int?=nil, limit: Int?=nil) -> [T.CoreDataType] {
