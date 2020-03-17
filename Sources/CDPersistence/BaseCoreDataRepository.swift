@@ -33,6 +33,20 @@ open class BaseCoreDataRepository<T:CDRepresentable>: AbstractRepository where T
         self.remove(id: value.id)
     }
 
+    public func insert(value: T) {
+        let managedObject = create()
+        value.update(value: managedObject)
+        try? self.managedObjectContext.save()
+    }
+
+    public func insertMany(value: [T]) {
+        value.forEach(self.insert)
+    }
+
+    public func saveMany(value: [T]) {
+        value.forEach(self.save)
+    }
+
     public func getById(id: T.Identifier) -> T? {
         return self.get(predicate: self.getIdPredicate(id: id))
     }
@@ -48,13 +62,17 @@ open class BaseCoreDataRepository<T:CDRepresentable>: AbstractRepository where T
         self.managedObjectContext.delete(object)
     }
 
-    public func find(predicate: NSPredicate) -> [T] {
-        return self.getManagedObjects(predicate: predicate).map { $0.asDomain() }
+    public func find(request: FindRequest) -> [T] {
+        let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: request.predicates)
+        return self.getManagedObjects(predicate: compoundPredicate, sortDescriptors: request.sortDescriptors, skip:  request.skip, limit: request.limit).map { $0.asDomain() }
     }
 
-    private func getManagedObjects(predicate: NSPredicate) -> [T.CoreDataType] {
+    private func getManagedObjects(predicate: NSPredicate, sortDescriptors: [NSSortDescriptor]?=nil, skip: Int?=nil, limit: Int?=nil) -> [T.CoreDataType] {
         let request = NSFetchRequest<T.CoreDataType>(entityName: T.CoreDataType.entityName)
         request.predicate = predicate
+        request.fetchOffset = skip ?? 0
+        request.fetchLimit = limit ?? 0
+        request.sortDescriptors = sortDescriptors
         return (try? self.managedObjectContext.fetch(request)) ?? []
     }
 
