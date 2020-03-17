@@ -25,7 +25,7 @@ open class BaseCoreDataRepository<T:CDRepresentable>: AbstractRepository where T
         try? self.managedObjectContext.save()
     }
 
-    private func create() -> T.CoreDataType {
+    public func create() -> T.CoreDataType {
         return NSEntityDescription.insertNewObject(forEntityName: T.CoreDataType.entityName, into: self.managedObjectContext) as! T.CoreDataType
     }
 
